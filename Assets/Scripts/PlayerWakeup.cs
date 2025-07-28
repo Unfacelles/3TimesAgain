@@ -22,7 +22,7 @@ public class PlayerWakeup : MonoBehaviour
 
             // Временный обход, если Animation Event не работает:
             // Закомментируй строку ниже, если анимация уже вызывает EnableMovement()
-            Invoke(nameof(EnableMovement), 3f);
+            Invoke(nameof(EnableMovement), 1f);
         }
     }
 
