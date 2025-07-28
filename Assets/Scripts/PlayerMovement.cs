@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private bool isGrounded;
     [HideInInspector] public bool canMove = false;
+    [HideInInspector] public bool isClimbing = false;
 
     void Start()
     {
@@ -20,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (!canMove)
+        if (!canMove || isClimbing)
         {
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
             return;
@@ -43,10 +44,8 @@ public class PlayerMovement : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         if (Mathf.Abs(horizontalInput) < 0.01f) return;
 
-        // This direction will be (-1, 0, 0) for left, (1, 0, 0) for right
         Vector3 direction = new Vector3(horizontalInput, 0f, 0f).normalized;
 
-        // Cast rays from ray origins in the move direction
         RaycastHit hitLower;
         if (Physics.Raycast(stepRayLower.position, direction, out hitLower, 0.3f))
         {
@@ -55,14 +54,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 float stepY = hitLower.point.y;
                 float playerY = rb.position.y;
-
                 float stepOffset = stepY - playerY;
 
                 if (stepOffset > 0f && stepOffset <= stepHeight)
                 {
-                    // Try a stronger forward push
-                    float forwardPushStrength = 0.7f; // tweakable
-
+                    float forwardPushStrength = 0.7f;
                     Vector3 upwardStep = new Vector3(0f, stepOffset, 0f);
                     Vector3 forwardStep = direction * forwardPushStrength;
 
@@ -72,9 +68,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
-
     void OnCollisionEnter(Collision collision)
     {
         if (collision.contacts[0].normal == Vector3.up)
@@ -83,7 +76,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Optional: draw rays in Scene view for debugging
     void OnDrawGizmos()
     {
         if (stepRayLower && stepRayUpper)
